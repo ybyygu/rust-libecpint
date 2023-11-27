@@ -11,6 +11,7 @@ repository = "https://github.com/dtolnay/cxx"
 [dependencies]
 cxx = "1.0"
 autocxx = "0.26.0"
+miette = "5.0"
 
 
 [build-dependencies]

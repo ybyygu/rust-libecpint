@@ -1,3 +1,5 @@
+#include "cxxgen.h"
+
 /*! EXAMPLE
         shows calculation of ECP integrals and first derivatives for HI
         in a cc-pVDZ(-PP) basis, using ECP28MDF
@@ -82,12 +84,12 @@ void read_basis_file(std::string filename, DVec &exps, DVec &coeffs,
   }
 }
 
-void test_ecpint() {
+ECPData test_ecpint(std::string share_dir) {
   using namespace libecpint;
 
   // this code expects the path to the libecpint/share directory
   // to be passed as an argument to the executable
-  std::string share_dir = "/usr/share/libecpint";
+  // std::string share_dir = "/usr/share/libecpint";
 
   // Roughly equilibrium position HI molecule
   // NOTE: coordinate values must be in BOHR
@@ -150,10 +152,14 @@ void test_ecpint() {
   // we could do the same with derivatives
   // this returns pointers in order [Hx, Hy, Hz, Ix, Iy, Iz]
   std::vector<std::shared_ptr<DVec>> derivs = factory.get_first_derivs();
-  // e.g. the Iodine y-derivative
-  Eigen::MatrixXd iodine_y_derivs =
-      Eigen::Map<Eigen::Matrix<double, 12, 12, Eigen::RowMajor>>(
-          derivs[4]->data());
-  std::cout << "y-derivs on iodine:" << std::endl;
-  std::cout << iodine_y_derivs << std::endl;
+  // Dereference the shared_ptr to get the underlying vector
+  ECPData result;
+  result.integrals = *ints;
+  std::vector<double> derivs_one_d;
+  for (const auto &ptr : derivs) {
+    derivs_one_d.insert(derivs_one_d.end(), ptr->begin(), ptr->end());
+  }
+  result.first_derivs = derivs_one_d;
+
+  return result;
 }
