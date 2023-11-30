@@ -9,15 +9,7 @@ include_cpp! {
     // as unsafe. Other policies are possible.
     safety!(unsafe)
     generate!("test_ecpint")
-    generate!("ECPIntWrapper")    
-
-}
-
-#[cxx::bridge]
-mod ffi2 {
-    unsafe extern "C++" {
-        include!("libecpint/api.hpp");
-    }
+    generate!("ECPIntWrapper")
 }
 
 fn main() {
@@ -26,7 +18,6 @@ fn main() {
     dbg!(ints.len());
     let derivs = ecpint.as_mut().get_first_derivs();
     dbg!(derivs.len());
-
 }
 
 use std::fs::File;

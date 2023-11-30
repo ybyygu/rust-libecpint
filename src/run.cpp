@@ -9,13 +9,6 @@
  */
 
 #include "libecpint.hpp"
-
-// if you want to try out the Eigen matrix build
-// #ifdef _WITH_EIGEN
-#include <Eigen/Core>
-#include <Eigen/Dense>
-// #endif
-
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -141,20 +134,15 @@ ECPData test_ecpint(std::string share_dir) {
   // grab the integrals
   std::shared_ptr<DVec> ints = factory.get_integrals();
 
-  // map into a square matrix
-  // note that we use ROW-MAJOR ORDERING
-  // 12 basis functions
-  Eigen::MatrixXd ecpints =
-      Eigen::Map<Eigen::Matrix<double, 12, 12, Eigen::RowMajor>>(ints->data());
-  std::cout << "ECP Integrals:" << std::endl;
-  std::cout << ecpints << std::endl;
-
   // we could do the same with derivatives
   // this returns pointers in order [Hx, Hy, Hz, Ix, Iy, Iz]
   std::vector<std::shared_ptr<DVec>> derivs = factory.get_first_derivs();
+
   // Dereference the shared_ptr to get the underlying vector
   ECPData result;
   result.integrals = *ints;
+
+  // create 1d vec data for easy access in ffi
   std::vector<double> derivs_one_d;
   for (const auto &ptr : derivs) {
     derivs_one_d.insert(derivs_one_d.end(), ptr->begin(), ptr->end());
